@@ -8,7 +8,7 @@
  * Copyright (c) 2012 Shinichi Tomita <shinichi.tomita@gmail.com>
  * Released under the MIT license
  */
-(function() {
+(function () {
 
   /**
    * Detect subsampling in loaded image.
@@ -55,15 +55,15 @@
       py = (ey + sy) >> 1;
     }
     var ratio = (py / ih);
-    return (ratio===0)?1:ratio;
+    return (ratio === 0) ? 1 : ratio;
   }
 
   /**
    * Rendering image element (with resizing) and get its data URL
    */
-  function renderImageToDataURL(img, options, doSquash) {
+  function renderImageToDataURL(img, options, doSquash, scale) {
     var canvas = document.createElement('canvas');
-    renderImageToCanvas(img, canvas, options, doSquash);
+    renderImageToCanvas(img, canvas, options, doSquash, scale);
     return canvas.toDataURL("image/jpeg", options.quality || 0.8);
   }
 
@@ -71,8 +71,10 @@
    * Rendering image element (with resizing) into the canvas element
    */
   function renderImageToCanvas(img, canvas, options, doSquash) {
+    var scale = options.scale || 1;
+    var offset = options.offset || 1;
     var iw = img.naturalWidth, ih = img.naturalHeight;
-    if (!(iw+ih)) return;
+    if (!(iw + ih)) return;
     var width = options.width, height = options.height;
     var ctx = canvas.getContext('2d');
     ctx.save();
@@ -97,7 +99,7 @@
       while (sx < iw) {
         tmpCtx.clearRect(0, 0, d, d);
         tmpCtx.drawImage(img, -sx, -sy);
-        ctx.drawImage(tmpCanvas, 0, 0, d, d, dx, dy, dw, dh);
+        ctx.drawImage(tmpCanvas, offset.left, offset.top, d, d, dx, dy, dw * scale, dh * scale);
         sx += d;
         dx += dw;
       }
@@ -168,15 +170,17 @@
   }
 
   var URL = typeof(window) !== 'undefined' && window.URL && window.URL.createObjectURL ? window.URL :
-            typeof(window) !== 'undefined' && window.webkitURL && window.webkitURL.createObjectURL ? window.webkitURL :
-            null;
+    typeof(window) !== 'undefined' && window.webkitURL && window.webkitURL.createObjectURL ? window.webkitURL :
+      null;
 
   /**
    * MegaPixImage class
    */
   function MegaPixImage(srcImage) {
     if (typeof(window) !== 'undefined' && window.Blob && srcImage instanceof Blob) {
-      if (!URL) { throw Error("No createObjectURL function found to create blob url"); }
+      if (!URL) {
+        throw Error("No createObjectURL function found to create blob url");
+      }
       var img = new Image();
       img.src = URL.createObjectURL(srcImage);
       this.blob = srcImage;
@@ -184,11 +188,11 @@
     }
     if (!srcImage.naturalWidth && !srcImage.naturalHeight) {
       var _this = this;
-      srcImage.onload = srcImage.onerror = function() {
+      srcImage.onload = srcImage.onerror = function () {
         var listeners = _this.imageLoadListeners;
         if (listeners) {
           _this.imageLoadListeners = null;
-          for (var i=0, len=listeners.length; i<len; i++) {
+          for (var i = 0, len = listeners.length; i < len; i++) {
             listeners[i]();
           }
         }
@@ -201,22 +205,26 @@
   /**
    * Rendering megapix image into specified target element
    */
-  MegaPixImage.prototype.render = function(target, options, callback) {
+  MegaPixImage.prototype.render = function (target, options, callback) {
     if (this.imageLoadListeners) {
       var _this = this;
-      this.imageLoadListeners.push(function() { _this.render(target, options, callback); });
+      this.imageLoadListeners.push(function () {
+        _this.render(target, options, callback);
+      });
       //return;
     }
     options = options || {};
+    var scale = options.scale || 1;
+    var offset = options.offset || 1;
     var srcImage = this.srcImage,
-        src = srcImage.src,
-        srcLength = src.length,
-        imgWidth = srcImage.naturalWidth, imgHeight = srcImage.naturalHeight,
-        width = options.width, height = options.height,
-        maxWidth = options.maxWidth, maxHeight = options.maxHeight,
-        doSquash = this.blob && this.blob.type === 'image/jpeg' ||
+      src = srcImage.src,
+      srcLength = src.length,
+      imgWidth = srcImage.naturalWidth, imgHeight = srcImage.naturalHeight,
+      width = options.width, height = options.height,
+      maxWidth = options.maxWidth, maxHeight = options.maxHeight,
+      doSquash = this.blob && this.blob.type === 'image/jpeg' ||
         src.indexOf('data:image/jpeg') === 0 ||
-        src.indexOf('.jpg') === srcLength - 4 || 
+        src.indexOf('.jpg') === srcLength - 4 ||
         src.indexOf('.jpeg') === srcLength - 5;
     if (width && !height) {
       height = (imgHeight * width / imgWidth) << 0;
@@ -234,14 +242,14 @@
       height = maxHeight;
       width = (imgWidth * height / imgHeight) << 0;
     }
-    var opt = { width : width, height : height };
+    var opt = {width: width, height: height};
     for (var k in options) opt[k] = options[k];
-    doSquash=true;
+    doSquash = true;
     var tagName = target.tagName.toLowerCase();
     if (tagName === 'img') {
-      target.src = renderImageToDataURL(this.srcImage, opt, doSquash);
+      target.src = renderImageToDataURL(this.srcImage, opt, doSquash, scale);
     } else if (tagName === 'canvas') {
-      renderImageToCanvas(this.srcImage, target, opt, doSquash);
+      renderImageToCanvas(this.srcImage, target, opt, doSquash, scale);
     }
     if (typeof this.onrender === 'function') {
       this.onrender(target);
@@ -259,7 +267,9 @@
    * Export class to global
    */
   if (typeof define === 'function' && define.amd) {
-    define([], function() { return MegaPixImage; }); // for AMD loader
+    define([], function () {
+      return MegaPixImage;
+    }); // for AMD loader
   } else if (module && module.exports) {
     module.exports = MegaPixImage;
   } else {
