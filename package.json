@@ -3,8 +3,11 @@
   "version": "2.0.0",
   "description": "Populate a canvas field with an image",
   "main": "src/index.js",
+  "repository": {
+    "type" : "git",
+    "url": "https://github.com/svenanders/imagetocanvas"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "minify": "./node_modules/.bin/uglifyjs index.js > dist/index.min.js",
     "npmpublish": "webpack && npm run minify && npm publish"
   },

@@ -75,7 +75,7 @@
 	};
 
 	ImageToCanvas.isRotated = function (orientation) {
-	  return !! ~[5, 6, 7, 8].indexOf(orientation);
+	  return !!~[5, 6, 7, 8].indexOf(orientation);
 	};
 
 	ImageToCanvas.getExifOrientation = function (image, callback) {
@@ -137,47 +137,44 @@
 	  }
 	};
 
-	ImageToCanvas.drawCanvas = function (input, canvas, img, orientation, w, h) {
+	ImageToCanvas.drawCanvas = function (canvas, img, orientation, w, h, scale, offset) {
 	  var mpImg;
-	  var ctx = canvas.getContext('2d');
-	  ctx.imageSmoothingEnabled = true;;
-	  img.style.display = 'none';
-	  var ExifOrientations = [{ op: 'none', degrees: 0 }, { op: 'flip-x', degrees: 0 }, { op: 'none', degrees: 180 }, { op: 'flip-y', degrees: 0 }, { op: 'flip-x', degrees: 90 }, { op: 'none', degrees: 90 }, { op: 'flip-x', degrees: -90 }, { op: 'none', degrees: -90 }];
-	  var exifOrientation = ExifOrientations[orientation - 1];
-	  var size = ImageToCanvas.calculateSize(img, 300);
-	  ImageToCanvas.setDimensions(document.querySelector("canvas"), size, orientation);
-	  // Flip vertically or horizontally
-	  if ('flip-x' == exifOrientation.op) flipContext(ctx, canvas, true, false);
-	  if ('flip-y' == exifOrientation.op) flipContext(ctx, canvas, false, true);
+	  var scale = scale || 1;
+	  var offset = offset || { left: 1, top: 1 };
 
-	  // Rotate image
-	  var canvasWidth = parseInt(document.querySelector("canvas").style.width.replace("px", ""));
-	  var canvasHeight = parseInt(document.querySelector("canvas").style.height.replace("px", ""));
-
-	  if (exifOrientation.degrees) {
-	    ImageToCanvas.rotateContext(ctx, {
-	      degrees: exifOrientation.degrees,
-	      x: canvasWidth / 2,
-	      y: canvasHeight / 2
-	    });
-
-	    if (ImageToCanvas.isRotated(orientation)) {
-	      var diff = canvasWidth - canvasHeight;
-	      ctx.translate(diff / 2, -diff / 2);
-	    }
-	  }
-	  if (false && ImageToCanvas.isiOS() || ImageToCanvas.isAndroid()) {
-	    var tempCanvas = document.createElement('canvas');
-	    var tempContext = tempCanvas.getContext("2d");
-	    tempContext.drawImage(img, 0, 0, img.width, img.height, 0, 0, 300, 150);
-	    var croppedCtx = tempCanvas.toDataURL();
-	    var newImg = new Image();
-	    newImg.src = croppedCtx;
-	    mpImg = new MegaPix(newImg);
-	    mpImg.render(canvas, { quality: 1.0, orientation: orientation });
-	  } else {
+	  if (ImageToCanvas.isAndroid()) {
 	    mpImg = new MegaPix(img);
 	    mpImg.render(canvas, { quality: 1.0, orientation: orientation });
+	  } else {
+	    var ctx = canvas.getContext('2d');
+	    ctx.imageSmoothingEnabled = true;;
+	    var ExifOrientations = [{ op: 'none', degrees: 0 }, { op: 'flip-x', degrees: 0 }, { op: 'none', degrees: 180 }, { op: 'flip-y', degrees: 0 }, { op: 'flip-x', degrees: 90 }, { op: 'none', degrees: 90 }, { op: 'flip-x', degrees: -90 }, { op: 'none', degrees: -90 }];
+	    var exifOrientation = ExifOrientations[orientation - 1];
+	    var size = ImageToCanvas.calculateSize(img, 300);
+	    ImageToCanvas.setDimensions(document.querySelector("canvas"), size, orientation);
+
+	    // Flip vertically or horizontally
+	    if ('flip-x' == exifOrientation.op) flipContext(ctx, canvas, true, false);
+	    if ('flip-y' == exifOrientation.op) flipContext(ctx, canvas, false, true);
+
+	    // Rotate image
+	    var canvasWidth = parseInt(document.querySelector("canvas").style.width.replace("px", ""));
+	    var canvasHeight = parseInt(document.querySelector("canvas").style.height.replace("px", ""));
+
+	    if (exifOrientation.degrees) {
+	      ImageToCanvas.rotateContext(ctx, {
+	        degrees: exifOrientation.degrees,
+	        x: canvasWidth / 2,
+	        y: canvasHeight / 2
+	      });
+
+	      if (ImageToCanvas.isRotated(orientation)) {
+	        var diff = canvasWidth - canvasHeight;
+	        ctx.translate(diff / 2, -diff / 2);
+	      }
+	    }
+	    mpImg = new MegaPix(img);
+	    mpImg.render(canvas, { quality: 1.0, orientation: orientation, scale: scale, offset: offset });
 	  }
 	};
 	module.exports = ImageToCanvas;
@@ -253,9 +250,9 @@
 	  /**
 	   * Rendering image element (with resizing) and get its data URL
 	   */
-	  function renderImageToDataURL(img, options, doSquash) {
+	  function renderImageToDataURL(img, options, doSquash, scale) {
 	    var canvas = document.createElement('canvas');
-	    renderImageToCanvas(img, canvas, options, doSquash);
+	    renderImageToCanvas(img, canvas, options, doSquash, scale);
 	    return canvas.toDataURL("image/jpeg", options.quality || 0.8);
 	  }
 
@@ -263,6 +260,8 @@
 	   * Rendering image element (with resizing) into the canvas element
 	   */
 	  function renderImageToCanvas(img, canvas, options, doSquash) {
+	    var scale = options.scale || 1;
+	    var offset = options.offset || 1;
 	    var iw = img.naturalWidth,
 	        ih = img.naturalHeight;
 	    if (!(iw + ih)) return;
@@ -291,7 +290,7 @@
 	      while (sx < iw) {
 	        tmpCtx.clearRect(0, 0, d, d);
 	        tmpCtx.drawImage(img, -sx, -sy);
-	        ctx.drawImage(tmpCanvas, 0, 0, d, d, dx, dy, dw, dh);
+	        ctx.drawImage(tmpCanvas, offset.left, offset.top, d, d, dx, dy, dw * scale, dh * scale);
 	        sx += d;
 	        dx += dw;
 	      }
@@ -404,6 +403,8 @@
 	      //return;
 	    }
 	    options = options || {};
+	    var scale = options.scale || 1;
+	    var offset = options.offset || 1;
 	    var srcImage = this.srcImage,
 	        src = srcImage.src,
 	        srcLength = src.length,
@@ -436,9 +437,9 @@
 	    }doSquash = true;
 	    var tagName = target.tagName.toLowerCase();
 	    if (tagName === 'img') {
-	      target.src = renderImageToDataURL(this.srcImage, opt, doSquash);
+	      target.src = renderImageToDataURL(this.srcImage, opt, doSquash, scale);
 	    } else if (tagName === 'canvas') {
-	      renderImageToCanvas(this.srcImage, target, opt, doSquash);
+	      renderImageToCanvas(this.srcImage, target, opt, doSquash, scale);
 	    }
 	    if (typeof this.onrender === 'function') {
 	      this.onrender(target);
@@ -460,10 +461,10 @@
 	      return MegaPixImage;
 	    }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)); // for AMD loader
 	  } else if (module && module.exports) {
-	      module.exports = MegaPixImage;
-	    } else {
-	      this.MegaPixImage = MegaPixImage;
-	    }
+	    module.exports = MegaPixImage;
+	  } else {
+	    this.MegaPixImage = MegaPixImage;
+	  }
 	})();
 
 /***/ },

@@ -3,10 +3,10 @@ var webpack = require('webpack');
 
 module.exports = {
   entry: [
-    './src/index'
+    path.join(__dirname, 'src', 'index')
   ],
   output: {
-    filename: './index.js'
+    filename: path.join(__dirname, 'index.js')
   },
   module: {
     loaders: [{
