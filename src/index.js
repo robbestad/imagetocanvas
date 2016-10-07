@@ -91,8 +91,6 @@ ImageToCanvas.drawCanvas = function (canvas, img, orientation, w, h, scale, offs
   var mpImg;
   var scale = scale || 1;
   var offset = offset || {left: 1, top: 1};
-  console.log('setDim', setDim);
-
   var setDim = 'undefined' !== typeof setDim ? setDim : true;
 
   if (ImageToCanvas.isAndroid()) {
@@ -115,8 +113,6 @@ ImageToCanvas.drawCanvas = function (canvas, img, orientation, w, h, scale, offs
     var exifOrientation = ExifOrientations[orientation - 1];
     var size = ImageToCanvas.calculateSize(img, 300);
     if (setDim) {
-      console.log('setting dim');
-
       ImageToCanvas.setDimensions(document.querySelector("canvas"), size, orientation);
     }
 

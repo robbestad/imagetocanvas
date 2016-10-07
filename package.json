@@ -9,7 +9,8 @@
   },
   "scripts": {
     "minify": "./node_modules/.bin/uglifyjs index.js > dist/index.min.js",
-    "npmpublish": "webpack && npm run minify && npm version patch && npm publish"
+    "prep": "webpack && npm run minify",
+    "pub": "npm version patch && npm publish"
   },
   "author": "Sven Anders Robbestad <robbestad@gmail.com> (http://svenardo.com)",
   "license": "ISC",
