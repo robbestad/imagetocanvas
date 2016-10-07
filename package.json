@@ -4,12 +4,12 @@
   "description": "Populate a canvas field with an image",
   "main": "src/index.js",
   "repository": {
-    "type" : "git",
+    "type": "git",
     "url": "https://github.com/svenanders/imagetocanvas"
   },
   "scripts": {
     "minify": "./node_modules/.bin/uglifyjs index.js > dist/index.min.js",
-    "npmpublish": "webpack && npm run minify && npm publish"
+    "npmpublish": "webpack && npm run minify && npm version patch && npm publish"
   },
   "author": "Sven Anders Robbestad <robbestad@gmail.com> (http://svenardo.com)",
   "license": "ISC",
@@ -23,5 +23,8 @@
     "exif-js": "^2.1.1",
     "uglifyjs": "^2.4.10",
     "webpack": "^1.12.11"
+  },
+  "dependencies": {
+    "exif-js": "^2.1.1"
   }
 }
