@@ -137,21 +137,28 @@
 	  }
 	};
 
-	ImageToCanvas.drawCanvas = function (canvas, img, orientation, w, h, scale, offset) {
+	ImageToCanvas.drawCanvas = function (canvas, img, orientation, w, h, scale, offset, setDim) {
 	  var mpImg;
 	  var scale = scale || 1;
 	  var offset = offset || { left: 1, top: 1 };
+	  console.log('setDim', setDim);
+
+	  var setDim = 'undefined' !== typeof setDim ? setDim : true;
 
 	  if (ImageToCanvas.isAndroid()) {
 	    mpImg = new MegaPix(img);
 	    mpImg.render(canvas, { quality: 1.0, orientation: orientation });
 	  } else {
 	    var ctx = canvas.getContext('2d');
-	    ctx.imageSmoothingEnabled = true;;
+	    ctx.imageSmoothingEnabled = true;
 	    var ExifOrientations = [{ op: 'none', degrees: 0 }, { op: 'flip-x', degrees: 0 }, { op: 'none', degrees: 180 }, { op: 'flip-y', degrees: 0 }, { op: 'flip-x', degrees: 90 }, { op: 'none', degrees: 90 }, { op: 'flip-x', degrees: -90 }, { op: 'none', degrees: -90 }];
 	    var exifOrientation = ExifOrientations[orientation - 1];
 	    var size = ImageToCanvas.calculateSize(img, 300);
-	    ImageToCanvas.setDimensions(document.querySelector("canvas"), size, orientation);
+	    if (setDim) {
+	      console.log('setting dim');
+
+	      ImageToCanvas.setDimensions(document.querySelector("canvas"), size, orientation);
+	    }
 
 	    // Flip vertically or horizontally
 	    if ('flip-x' == exifOrientation.op) flipContext(ctx, canvas, true, false);
