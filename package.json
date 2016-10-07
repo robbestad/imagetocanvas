@@ -1,6 +1,6 @@
 {
   "name": "imagetocanvas",
-  "version": "2.0.4",
+  "version": "2.0.3",
   "description": "Populate a canvas field with an image",
   "main": "src/index.js",
   "repository": {
@@ -9,7 +9,7 @@
   },
   "scripts": {
     "minify": "./node_modules/.bin/uglifyjs index.js > dist/index.min.js",
-    "prep": "webpack && npm run minify",
+    "prep": "webpack && npm run minify && echo Now commit and then do ** npm run pub **",
     "pub": "npm version patch && npm publish"
   },
   "author": "Sven Anders Robbestad <robbestad@gmail.com> (http://svenardo.com)",
@@ -21,7 +21,6 @@
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-react": "^6.3.13",
     "babel-tape-runner": "^2.0.0",
-    "exif-js": "^2.1.1",
     "uglifyjs": "^2.4.10",
     "webpack": "^1.12.11"
   },
