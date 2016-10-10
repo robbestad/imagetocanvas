@@ -48,10 +48,8 @@ ImageToCanvas.getExifOrientation = function (image) {
 ImageToCanvas.toBlob = function (dataURI, dataType) {
   return new Promise(function(resolve) {
     var type = dataType || dataURI.split(',')[0].split(':')[1].split(';')[0] || 'image/jpeg';
-    // convert to jpeg
-    var img = new Image();
     if (type !== 'image/jpeg') {
-      // convert to jpeg because Safari & Firefox won't let us use pngs
+      // convert to jpeg because Safari & Firefox has issues with pngs
       var canvas = document.createElement("canvas");
       var ctx = canvas.getContext("2d");
       var img = new Image();

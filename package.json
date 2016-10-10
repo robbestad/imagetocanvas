@@ -1,7 +1,7 @@
 {
   "name": "imagetocanvas",
-  "version": "2.0.6",
-  "description": "Populate a canvas field with an image",
+  "version": "2.1.1",
+  "description": "A set of tools to help you confidently draw an image to a canvas field, with correct orientation for mobile cameras",
   "main": "src/index.js",
   "repository": {
     "type": "git",
@@ -19,7 +19,6 @@
     "babel-loader": "^6.2.0",
     "babel-plugin-react-transform": "^2.0.0",
     "babel-preset-latest": "^6.16.0",
-    "babel-preset-react": "^6.3.13",
     "babel-tape-runner": "^2.0.0",
     "es6-promise": "^4.0.5",
     "uglifyjs": "^2.4.10",
