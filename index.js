@@ -99,18 +99,16 @@
 	    // convert to jpeg
 	    var img = new Image();
 	    if (type !== 'image/jpeg') {
-	      (function () {
-	        // convert to jpeg because Safari & Firefox won't let us use pngs
-	        var canvas = document.createElement("canvas");
-	        var ctx = canvas.getContext("2d");
-	        var img = new Image();
-	        img.onload = function () {
-	          ctx.drawImage(img, 0, 0);
-	          var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-	          resolve(new Blob([new Uint8Array(imgData.data)], { type: 'image/jpeg' }));
-	        };
-	        img.src = dataURI;
-	      })();
+	      // convert to jpeg because Safari & Firefox won't let us use pngs
+	      var canvas = document.createElement("canvas");
+	      var ctx = canvas.getContext("2d");
+	      var img = new Image();
+	      img.onload = function () {
+	        ctx.drawImage(img, 0, 0);
+	        var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+	        resolve(new Blob([new Uint8Array(imgData.data)], { type: 'image/jpeg' }));
+	      };
+	      img.src = dataURI;
 	    } else {
 	      var binary = atob(dataURI.split(',')[1]),
 	          array = [];
