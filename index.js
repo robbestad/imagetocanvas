@@ -97,29 +97,27 @@
 	  return new Promise(function (resolve) {
 	    var type = dataType || dataURI.split(',')[0].split(':')[1].split(';')[0] || 'image/jpeg';
 	    // convert to jpeg
-	    // const img = new Image();
-	    // if (type !== 'image/jpeg') {
-	    //   // convert to jpeg because Safari & Firefox won't let us use pngs
-	    //   const canvas = document.createElement("canvas");
-	    //   const ctx = canvas.getContext("2d");
-	    //   const img = new Image();
-	    //   img.onload = function () {
-	    //     ctx.drawImage(img, 0, 0);
-	    //     const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-	    //     resolve(new Blob([new Uint8Array(imgData.data)], {type: 'image/jpeg'}));
-	    //   };
-	    //   img.src = dataURI;
-	    // } else {
-	    //   var binary = atob(dataURI.split(',')[1]), array = [];
-	    //   for (var i = 0; i < binary.length; i++) array.push(binary.charCodeAt(i));
-	    //   resolve(new Blob([new Uint8Array(array)], {type: type}));
-	    // }
-	    //
-	    var binary = atob(dataURI.split(',')[1]),
-	        array = [];
-	    for (var i = 0; i < binary.length; i++) {
-	      array.push(binary.charCodeAt(i));
-	    }resolve(new Blob([new Uint8Array(array)], { type: type }));
+	    var img = new Image();
+	    if (type !== 'image/jpeg') {
+	      (function () {
+	        // convert to jpeg because Safari & Firefox won't let us use pngs
+	        var canvas = document.createElement("canvas");
+	        var ctx = canvas.getContext("2d");
+	        var img = new Image();
+	        img.onload = function () {
+	          ctx.drawImage(img, 0, 0);
+	          var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+	          resolve(new Blob([new Uint8Array(imgData.data)], { type: 'image/jpeg' }));
+	        };
+	        img.src = dataURI;
+	      })();
+	    } else {
+	      var binary = atob(dataURI.split(',')[1]),
+	          array = [];
+	      for (var i = 0; i < binary.length; i++) {
+	        array.push(binary.charCodeAt(i));
+	      }resolve(new Blob([new Uint8Array(array)], { type: type }));
+	    }
 	  });
 	};
 

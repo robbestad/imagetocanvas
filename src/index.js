@@ -43,42 +43,37 @@ ImageToCanvas.getExifOrientation = function (image) {
       resolve(orientation);
     });
   });
-}
+};
 
 ImageToCanvas.toBlob = function (dataURI, dataType) {
   return new Promise(resolve => {
     const type = dataType || dataURI.split(',')[0].split(':')[1].split(';')[0] || 'image/jpeg';
     // convert to jpeg
-    // const img = new Image();
-    // if (type !== 'image/jpeg') {
-    //   // convert to jpeg because Safari & Firefox won't let us use pngs
-    //   const canvas = document.createElement("canvas");
-    //   const ctx = canvas.getContext("2d");
-    //   const img = new Image();
-    //   img.onload = function () {
-    //     ctx.drawImage(img, 0, 0);
-    //     const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    //     resolve(new Blob([new Uint8Array(imgData.data)], {type: 'image/jpeg'}));
-    //   };
-    //   img.src = dataURI;
-    // } else {
-    //   var binary = atob(dataURI.split(',')[1]), array = [];
-    //   for (var i = 0; i < binary.length; i++) array.push(binary.charCodeAt(i));
-    //   resolve(new Blob([new Uint8Array(array)], {type: type}));
-    // }
-    //
-    const binary = atob(dataURI.split(',')[1]), array = [];
-    for (let i = 0; i < binary.length; i++) array.push(binary.charCodeAt(i));
-    resolve(new Blob([new Uint8Array(array)], {type: type}));
-
+    const img = new Image();
+    if (type !== 'image/jpeg') {
+      // convert to jpeg because Safari & Firefox won't let us use pngs
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const img = new Image();
+      img.onload = function () {
+        ctx.drawImage(img, 0, 0);
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        resolve(new Blob([new Uint8Array(imgData.data)], {type: 'image/jpeg'}));
+      };
+      img.src = dataURI;
+    } else {
+      const binary = atob(dataURI.split(',')[1]), array = [];
+      for (let i = 0; i < binary.length; i++) array.push(binary.charCodeAt(i));
+      resolve(new Blob([new Uint8Array(array)], {type: type}));
+    }
   });
-
 };
+
 
 ImageToCanvas.flipContext = function (ctx, canvas, x, y) {
   ctx.translate(x ? canvas.width : 0, y ? canvas.height : 0);
   ctx.scale(x ? -1 : 1, y ? -1 : 1);
-}
+};
 
 ImageToCanvas.rotateContext = function (ctx, attr) {
   var x = attr.x || 0;
