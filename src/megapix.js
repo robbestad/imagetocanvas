@@ -72,7 +72,7 @@
    */
   function renderImageToCanvas(img, canvas, options, doSquash) {
     var scale = options.scale || 1;
-    var offset = options.offset || 1;
+    var offset = options.offset || {left: 0, top: 0};
     var iw = img.naturalWidth, ih = img.naturalHeight;
     if (!(iw + ih)) return;
     var width = options.width, height = options.height;
@@ -96,10 +96,12 @@
     while (sy < ih) {
       var sx = 0;
       var dx = 0;
+      var left = offset.left;
+      var top = offset.top;
       while (sx < iw) {
         tmpCtx.clearRect(0, 0, d, d);
         tmpCtx.drawImage(img, -sx, -sy);
-        ctx.drawImage(tmpCanvas, offset.left, offset.top, d, d, dx, dy, dw * scale, dh * scale);
+        ctx.drawImage(tmpCanvas, ~~left, ~~top, d, d, dx, dy, dw * scale, dh * scale);
         sx += d;
         dx += dw;
       }
@@ -215,7 +217,8 @@
     }
     options = options || {};
     var scale = options.scale || 1;
-    var offset = options.offset || 1;
+    var offset = options.offset || {left: 0, top: 0};
+
     var srcImage = this.srcImage,
       src = srcImage.src,
       srcLength = src.length,
