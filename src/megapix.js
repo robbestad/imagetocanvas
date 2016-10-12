@@ -101,7 +101,7 @@
       while (sx < iw) {
         tmpCtx.clearRect(0, 0, d, d);
         tmpCtx.drawImage(img, -sx, -sy);
-        ctx.drawImage(tmpCanvas, ~~left, ~~top, d, d, dx, dy, dw * scale, dh * scale);
+        ctx.drawImage(tmpCanvas, left, top, d-left, d-top, dx, dy, dw * scale, dh * scale);
         sx += d;
         dx += dw;
       }
