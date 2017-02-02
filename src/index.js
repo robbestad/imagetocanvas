@@ -2,7 +2,7 @@
 var ImageToCanvas = {};
 var MegaPix = require('./megapix');
 var EXIF = require('exif-js');
-require('es6-promise/auto'); // for IE
+//require('es6-promise/auto'); // for IE
 
 ImageToCanvas.isPortrait = function (img) {
   return (img.height > img.width);
