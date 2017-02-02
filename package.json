@@ -1,6 +1,6 @@
 {
   "name": "imagetocanvas",
-  "version": "2.1.2",
+  "version": "3.0.0",
   "description": "A set of tools to help you confidently draw an image to a canvas field, with correct orientation for mobile cameras",
   "main": "src/index.js",
   "repository": {
